@@ -107,7 +107,7 @@
       const username = document.getElementById('username').value;
       const email = document.getElementById('email').value;
 
-      await fetch('/setCookie', {
+      await fetch('/cookies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email })
@@ -117,7 +117,7 @@
     });
 
     getCookieBtn.addEventListener('click', async () => {
-      const res = await fetch('/getCookies');
+      const res = await fetch('/cookies');
       const data = await res.json();
       console.log('🍪 Cookie actual:', data);
       alert(`Cookie: ${JSON.stringify(data)}`);
