@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Iniciar sesión</h2>
+    {{#if error}}
+      <div class="alert">¡Login failed! Revisa tus credenciales</div>
+    {{/if}}
+    <form method="POST" action="/users/login">
+      <input name="email" placeholder="Email" type="email" required />
+      <input name="password" placeholder="Contraseña" type="password" required />
+      <button type="submit">Ingresar</button>
+    </form>
+  </div>
+</body>
+</html>
