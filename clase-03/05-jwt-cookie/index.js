@@ -1,54 +1,47 @@
-import express from "express";
-import bcrypt from "bcrypt";
-import cookieParser from "cookie-parser";
-import { generateToken } from "./utils.js";
+import express from 'express'
+import bcrypt from 'bcrypt'
+import cookieParser from 'cookie-parser'
+import { generateToken } from './utils.js'
 
-const app = express();
-const PORT = 8080;
-const users = [];
+const app = express()
+const PORT = 8080
+const users = []
 
-const createHash = (password) =>
-  bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-const isValidPassword = (user, password) =>
-  bcrypt.compareSync(password, user.password);
+const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10)); // para el registro
 
-app.use(express.static("public"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+const isValidPassword = (user, password) => bcrypt.compareSync(password, user.password);
 
-app.post("/register", (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password)
-    return res.status(400).json({ error: "Faltan campos" });
+app.use(express.static('public'))
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+app.use(cookieParser())
 
-  const existing = users.find((u) => u.username === username);
-  if (existing) return res.status(409).json({ error: "Ya existe ese usuario" });
+app.post('/register', (req, res) => {
+    const { username, password } = req.body;
 
-  const hashed = createHash(password);
-  users.push({ username, password: hashed });
-  res.json({ message: "Usuario registrado" });
-});
+    const existing = users.find(u => u.username === username)
+    if (existing) return res.status(400).json("ya existe")
 
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find((u) => u.username === username);
-  if (!user || !isValidPassword(user, password)) {
-    return res.status(401).json({ error: "Credenciales inválidas" });
-  }
+    const hashedPassword = createHash(password)
+    users.push({username, password: hashedPassword})
+    res.status(201).json("creado")
+})
 
-  const token = generateToken(user);
+app.get('/login/:username/:password', (req, res) => {
+    const { username, password } = req.params;
 
-  //PRIMERO ASI
-//   res.json({ token });  ASI LA COOKIE NO VA SEGURA
+    const user = users.find(u => u.username === username)
+    if (!user || !isValidPassword(user, password)) return res.status(400).json("credenciales invalidas")
+    
+    const token = generateToken(user)
 
-
-  res.cookie("token", token, { httpOnly: true,
-    maxAge: 3600000, // 1 hora
-   });
-  res.json({ message: "Login exitoso" });
-});
+    res.cookie("token", token, {
+        httpOnly: true,
+        maxAge: 3600000,
+    })
+    res.json('login exitoso')
+})
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+    console.log('ldasdasd')
+})
