@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="login-container">
+    <h2>Crear cuenta</h2>
+    <p>Registrate para empezar</p>
+
+    {{#if error}}
+      <p class="error">{{error}}</p>
+    {{/if}}
+
+    <form method="POST" action="/register">
+      <input type="text" name="username" placeholder="Nombre" required />
+      <input type="password" name="password" placeholder="Contraseña" required />
+      <button type="submit">Registrarme</button>
+    </form>
+
+    <div class="register-link">
+      <p>¿Ya tenés cuenta?</p>
+      <a href="/"><button class="register-btn">Ir al login</button></a>
+    </div>
+  </div>
+</body>
+</html>

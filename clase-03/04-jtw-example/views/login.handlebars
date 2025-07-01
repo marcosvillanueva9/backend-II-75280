@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="login-container">
+    <h2>Bienvenido</h2>
+    <p>Iniciá sesión para continuar</p>
+
+    <p id="error" class="error"></p>
+
+    <form id="login-form">
+      <input type="text" name="username" placeholder="Nombre de usuario" required />
+      <input type="password" name="password" placeholder="Contraseña" required />
+      <button type="submit">Ingresar</button>
+    </form>
+
+    <div class="forgot-password">
+      <a href="/forgot-password"><button class="register-btn">¿Olvidaste tu contraseña?</button></a>
+    </div>
+
+    <div class="register-link">
+      <p>¿No tenés cuenta?</p>
+      <a href="/register"><button class="register-btn">Registrarse</button></a>
+    </div>
+  </div>
+
+  <script>
+  const form = document.getElementById("login-form");
+  const errorText = document.getElementById("error");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const payload = {
+      username: formData.get("username"),
+      password: formData.get("password"),
+    };
+
+    try {
+      const res = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorText.textContent = data.error || "Error al iniciar sesión";
+        return;
+      }
+
+      // Guardar el token
+      localStorage.setItem("token", data.token);
+
+      // Hacer fetch al home con el token en el header
+      const verifyRes = await fetch("/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+        },
+      });
+
+      if (verifyRes.redirected) {
+        // Por si el backend redirige automáticamente
+        window.location.href = verifyRes.url;
+      } else {
+        // Si todo va bien, redirigimos manualmente
+        window.location.href = "/";
+      }
+
+    } catch (err) {
+      errorText.textContent = "Error de red";
+    }
+  });
+</script>
+
+</body>
+</html>

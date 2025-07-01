@@ -1,54 +1,55 @@
-import express from 'express'
-import cookieParser from 'cookie-parser'
+import express from 'express';
+import cookieParser from 'cookie-parser';
 
-const app = express()
+const app = express();
 
-app.use(express.json())
-
-app.use(cookieParser('CoderSecret'))
+app.use(cookieParser('mi-secreto'));
+app.use(express.json());
 
 app.post('/cookies', (req, res) => {
-    let { clave, valor, tiempo, firmada } = req.body
+    let { clave, valor, tiempo, firma } = req.body;
 
-    if (!firmada) {
-        firmada = false
+    if (!firma) {
+        firma = false;
     }
 
     if (!clave || !valor) {
-        return res.json({error: 'falta nombre o valor'})
+        return res.status(400).json({ error: 'Faltan datos' });
     }
 
     if (tiempo) {
-        res.cookie(clave, valor, { maxAge: parseInt(tiempo) * 1000, signed: firmada })
+        res.cookie(clave, valor, { maxAge: tiempo * 1000, signed: firma });
     } else {
-        res.cookie(clave, valor, { signed: firmada })
+        res.cookie(clave, valor, { signed: firma });
     }
 
-    res.json({ proceso: 'ok' })
+    res.json({ proceso: 'ok' });
 })
 
 app.get('/cookies', (req, res) => {
-    res.json({ noFirmadas: req.cookies, firmadas: req.signedCookies })
+    res.json({
+        normalCookies: req.cookies,
+        firmadasCookies: req.signedCookies
+    });
 })
 
 app.get('/default', (req, res) => {
-    res.cookie('nofirmada', 'valor2', { maxAge: 1000 * 60 * 60, signed: false })
-    res.json({ proceso: 'ok' })
+    res.cookie('default', 'valor por defecto', { });
+    res.json({ proceso: 'ok' });
 })
 
 app.delete('/cookies/:clave', (req, res) => {
-    const { clave } = req.params
+    const { clave } = req.params;
 
-    if (!req.cookies[clave] && !req.signedCookies[clave]) {
-        return res.json({ error: 'nombre invalido' })
+    if (!clave) {
+        return res.status(400).json({ error: 'Falta la clave' });
     }
 
-    res.clearCookie(clave)
-    res.json({ proceso: 'ok' })
-})
+    res.clearCookie(clave);
+    res.json({ proceso: 'ok' });
+});
 
-const PORT = 8080
-
-const server = app.listen(PORT, () => {
-    console.log('Servidor escuchando en el ', PORT)
-})
+const PORT = 8080;
+app.listen(PORT, () => {
+    console.log(`Servidor escuchando en el puerto ${PORT}`);
+});

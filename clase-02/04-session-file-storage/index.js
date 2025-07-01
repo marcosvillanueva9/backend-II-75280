@@ -1,48 +1,43 @@
-import express from 'express'
-import session from 'express-session'
-// nuevo
-import sessionFileStore from 'session-file-store'
-const FileStore = sessionFileStore(session)
+import express from 'express';
+import session from 'express-session';
+import sessionFileStore from 'session-file-store';
 
-const app = express()
+const FileStore = sessionFileStore(session);
+
+const app = express();
+
+const PORT = 8080;
 
 app.use(session({
-
     store: new FileStore({
         path: './sessions',
-        ttl: 60
+        ttl: 3600
     }),
+    secret: 'coderhouse',
+    resave: true,
+    saveUninitialized: true,
+}));
 
-  secret: "sadsd!",
-  resave: false,
-  saveUninitialized: false
-}))
-
-app.get('/', (req,res)=>{
-  if(!req.session.contador){
-    req.session.contador = 1
-    req.session.nombre = req.query.nombre || "Anakin"
-    res.send("Hello there " + req.session.nombre)
-  } else {
-    req.session.contador++
-    res.send("Hello there " + req.session.nombre + " you have visited the page " + req.session.contador + " times.")
-  }
-})
-
-// aca crea tu olvidar
-app.get("/olvidar", (req, res) => {
-    const nombre = req.session.nombre || ""
-  req.session.destroy( err => {
-    if (err){
-      res.json({error: "algo hiciste mal", descripcion: err})
+app.get('/', (req, res) => {
+    if (!req.session.contador) {
+        req.session.contador = 1
+        req.session.nombre = req.query.nombre || 'Anakin';
+        res.send('Hello there ' + req.session.nombre);
     } else {
-      res.json({respuesta: "Hasta luego " + nombre}) 
+        req.session.contador++;
+        res.send('Hello there ' + req.session.nombre + ', Usted ha visitado esta pagina ' + req.session.contador + ' veces');
     }
-  })
-})
+});
 
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).send('Error al cerrar sesión');
+        }
+        res.send('Sesión cerrada');
+    });
+});
 
-const PORT = 8080
-
-app.listen(PORT, () => {console.log("escuchando en el 8080")})
- 
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
