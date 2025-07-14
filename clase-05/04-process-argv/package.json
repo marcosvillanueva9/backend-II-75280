@@ -1,0 +1,15 @@
+{
+  "name": "04-process-argv",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "commander.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "commander": "^14.0.0"
+  }
+}
